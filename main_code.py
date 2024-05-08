@@ -5,18 +5,28 @@
 
 ###################################################################################
 
-from pyparsing import nestedExpr
-
+from slpp import slpp as lua
+import pandas as pd
 
 def parse_lua_file(lua_file):
     with open(lua_file, 'r') as file:
-        lua_data = file.read()
-        parsed_data = nestedExpr('{', '}').parseString(lua_data).asList()
-        return parsed_data[0] if parsed_data else []
+        return lua.decode(file.read())
 
-# Exemple d'utilisation
-if __name__ == "__main__":
-    lua_file_path = "data"  # Remplacez cela par le chemin de votre fichier Lua
-    tableau_de_donnees = parse_lua_file(lua_file_path)
-    print("Données extraites du fichier Lua :")
-    print(tableau_de_donnees)
+
+lua_file_path = "data.lua"  # Remplacez cela par le chemin de votre fichier Lua
+tableau_de_donnees = parse_lua_file(lua_file_path)
+
+data = {"Item_Name" : tableau_de_donnees.keys()}
+
+data = pd.DataFrame(data)
+
+mode = []
+
+for item in tableau_de_donnees:
+    colonne = tableau_de_donnees[item]
+
+    mode.append(colonne["modes"])
+
+data["mode"] = mode
+
+print(data)

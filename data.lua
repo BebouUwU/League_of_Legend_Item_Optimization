@@ -1,4 +1,4 @@
-return {
+{
     ["Your Cut"] = {
     	["id"]                  = 3400,
         ["tier"]                = 1,

@@ -1,15 +1,13 @@
-from pyparsing import nestedExpr
-
+from slpp import slpp as lua
 
 def parse_lua_file(lua_file):
     with open(lua_file, 'r') as file:
-        lua_data = file.read()
-        parsed_data = nestedExpr('{', '}').parseString(lua_data).asList()
-        return parsed_data[0] if parsed_data else []
+        return lua.decode(file.read())
 
-# Exemple d'utilisation
-if __name__ == "__main__":
-    lua_file_path = "data_test.lua"  # Remplacez cela par le chemin de votre fichier Lua
-    tableau_de_donnees = parse_lua_file(lua_file_path)
-    print("Données extraites du fichier Lua :")
-    print(tableau_de_donnees)
+
+lua_file_path = "data_test.lua"  # Remplacez cela par le chemin de votre fichier Lua
+tableau_de_donnees = parse_lua_file(lua_file_path)
+print("Données extraites du fichier Lua :")
+print(tableau_de_donnees)
+
+
