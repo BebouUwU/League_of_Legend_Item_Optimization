@@ -13,7 +13,7 @@ def parse_lua_file(lua_file):
         return lua.decode(file.read())
 
 
-lua_file_path = "data.lua"  # Remplacez cela par le chemin de votre fichier Lua
+lua_file_path = "data.lua" 
 tableau_de_donnees = parse_lua_file(lua_file_path)
 
 data = {"Item_Name" : tableau_de_donnees.keys()}
@@ -26,7 +26,6 @@ data = pd.DataFrame(data)
 
 mode = []
 tier = []
-stat = []
 cost = []
 
 for item in tableau_de_donnees:
@@ -34,14 +33,25 @@ for item in tableau_de_donnees:
 
     mode.append(colonne.get("modes"))
     tier.append(colonne.get("tier"))
-    stat.append(colonne.get("stats"))
     cost.append(colonne.get("buy"))
 
 
+#Getting the items statistics from the data
+stat = [["Item_Name" ,"ad" ,"ah" ,"ap" ,"armor" ,"as" ,"crit" ,"critdamage" ,"hp" ,"hp5" ,"lifesteal" ,"mana" ,"mp5" ,"mr" ,"ms" ,"lethality" ,"mpenflat" ,"hsp" ,"omnivamp" ,"armpen" ,"mpen"]]  
+
+for item in tableau_de_donnees:
+    colonne = tableau_de_donnees[item]
+    statistics = colonne.get("stats")
+    if statistics != None :
+        stat.append([item,statistics.get("ad"),statistics.get("ah"),statistics.get("ap"),statistics.get("armor"),statistics.get("as"),statistics.get("crit"),statistics.get("critdamage"),statistics.get("hp"),statistics.get("hp5"),statistics.get("lifesteal"),statistics.get("mana"),statistics.get("mp5"),statistics.get("mr"),statistics.get("ms"),statistics.get("lethality"),statistics.get("mpenflat"),statistics.get("hsp"),statistics.get("omnivamp"),statistics.get("armpen"),statistics.get("mpen")])
+
+stat = pd.DataFrame(stat[1:],columns=stat[0])
+
 data["mode"] = mode
 data["tier"] = tier
-data["stat"] = stat
 data["cost"] = cost
+
+data = pd.merge(data,stat,how='left') #Merging of the two dataframe
 
 #################
 # Data modeling #
@@ -59,3 +69,4 @@ data = data[pd.to_numeric(data['cost'], errors='coerce').notna()]
 data.to_excel("loaded_data.xlsx",index = False)
 
 
+# Now calculating the value of each point of statistic #
