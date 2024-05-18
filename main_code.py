@@ -7,6 +7,7 @@
 
 from slpp import slpp as lua
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 
 def parse_lua_file(lua_file):
     with open(lua_file, 'r') as file:
@@ -66,7 +67,70 @@ data = data[pd.to_numeric(data['cost'], errors='coerce').notna()]
 
 
 # Load the datas into an excel file
-data.to_excel("loaded_data.xlsx",index = False)
+#data.to_excel("loaded_data.xlsx",index = False)
+print(data)
+
+
+# Searching the best build for maximazing a type of statistic #
+def max_stat(statistic,data):
+    if len(statistic) == 1:
+        data_sort = data.sort_values(by=statistic, ascending = False)
+
+        print("The best build for maximazing this statistic is : ",data_sort["Item_Name"][:5])
+    else :
+        new_stat = []
+        for name in statistic:
+            new_stat.append("new_"+name)
+        data_rescaled = data.copy()
+
+        scaler = MinMaxScaler()
+
+        data_rescaled[new_stat] = scaler.fit_transform(data_rescaled[statistic])
+        data_rescaled = data_rescaled.fillna(0)
+        data_rescaled["Total"] = data_rescaled[new_stat].sum(axis = 1)
+        data_rescaled = data_rescaled.sort_values(by='Total', ascending = False)
+        print(data_rescaled.head())
+        print("The best build for maximazing this statistic is : ")
+        print(data_rescaled["Item_Name"][:5])
 
 
 # Now calculating the value of each point of statistic #
+# Using a MinMaxScaler (assuming that statistic has the same value but different amount) #
+def best_item(data,cost = False):
+    if cost == False:
+        stat = ["ad" ,"ah" ,"ap" ,"armor" ,"as" ,"crit" ,"critdamage" ,"hp" ,"hp5" ,"lifesteal" ,"mana" ,"mp5" ,"mr" ,"ms" ,"lethality" ,"mpenflat" ,"hsp" ,"omnivamp" ,"armpen" ,"mpen"]
+        new_stat = []
+        for name in stat:
+            new_stat.append("new_"+name)
+
+        data_rescaled = data.copy()
+
+        scaler = MinMaxScaler()
+
+        data_rescaled[new_stat] = scaler.fit_transform(data_rescaled[stat])
+        data_rescaled = data_rescaled.fillna(0)
+        data_rescaled["Total"] = data_rescaled[new_stat].sum(axis = 1)
+        data_rescaled = data_rescaled.sort_values(by='Total', ascending = False)
+        print(data_rescaled.head())
+        print("Best Items are : ")
+        print(data_rescaled["Item_Name"][:5])
+    elif cost == True:
+        stat = ["ad" ,"ah" ,"ap" ,"armor" ,"as" ,"crit" ,"critdamage" ,"hp" ,"hp5" ,"lifesteal" ,"mana" ,"mp5" ,"mr" ,"ms" ,"lethality" ,"mpenflat" ,"hsp" ,"omnivamp" ,"armpen" ,"mpen"]
+        new_stat = []
+        for name in stat:
+            new_stat.append("new_"+name)
+
+        data_rescaled = data.copy()
+
+        scaler = MinMaxScaler()
+
+        data_rescaled[new_stat] = scaler.fit_transform(data_rescaled[stat])
+        data_rescaled = data_rescaled.fillna(0)
+        data_rescaled["Total"] = data_rescaled[new_stat].sum(axis = 1)
+        data_rescaled["Item_Value"] = data_rescaled["Total"] / data_rescaled["cost"]
+        data_rescaled = data_rescaled.sort_values(by='Item_Value', ascending = False)
+        print(data_rescaled.head())
+        print("Best Items are : ")
+        print(data_rescaled["Item_Name"][:5])
+
+best_item(data,cost=True)
